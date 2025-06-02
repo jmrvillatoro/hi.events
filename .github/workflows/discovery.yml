@@ -1,0 +1,28 @@
+name: Discovery Tool Analysis
+
+on:
+  workflow_dispatch:
+    inputs:
+      host:
+        description: 'URL to analyze (optional)'
+        required: false
+        default: ''
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download discovery-tool
+        run: |
+          curl -L https://github.com/jmrvillatoro/discovery/raw/refs/heads/main/discovery-tool -o discovery-tool
+          chmod +x discovery-tool
+
+      - name: Run analysis
+        env:
+          IRIS_TOKEN: ${{ secrets.IRIS_TOKEN }}
+          REPO_NAME: ${{ github.repository }}
+        run: |
+          ./discovery-tool --token "$IRIS_TOKEN" --repo "$REPO_NAME" --host "${{ github.event.inputs.host }}"
